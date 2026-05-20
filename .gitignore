@@ -1,0 +1,13 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+
+# Generated data files — reproducible from scripts
+data/*.csv
+data/*.json
+rules/flags_rules.csv
+
+# OS
+.DS_Store

@@ -1,0 +1,87 @@
+# rules/config.yaml
+# Rule definitions for particle detector telemetry.
+# InvariantChecker loads this at init time.
+# Every threshold lives here — no magic numbers in code.
+#
+# Severity scale:
+#   3 = HIGH   — logical impossibility, unambiguous violation
+#   2 = MEDIUM — physically implausible, likely corruption
+#   1 = LOW    — statistically unusual, treat as hypothesis
+
+# ── range checks ──────────────────────────────────────────────────────────────
+# Hard bounds derived from hardware specification.
+range_checks:
+  energy_deposit_keV:
+    min: 0.0          # exclusive — energy must be strictly positive
+    max: 500.0        # hardware ADC ceiling
+    severity: 3
+  temperature_K:
+    min: 270.0        # -3°C — below this the detector would be alarmed
+    max: 320.0        # 47°C — above this the detector would be shut down
+    severity: 2
+  signal_amplitude_mV:
+    min: 0.0          # amplitude is always non-negative
+    max: 600.0        # well above energy_max * max_gain + max_noise_floor
+    severity: 2
+  hit_multiplicity:
+    min: 0
+    max: 20           # physically, more than 20 hits per event is implausible
+    severity: 2
+
+# ── registered detector IDs ───────────────────────────────────────────────────
+# Any detector_id not in this set indicates a routing error in the DAQ.
+registered_detectors:
+  valid_ids: [1, 2, 3, 4, 5, 6, 7, 8]
+  severity: 3
+
+# ── valid channel IDs ─────────────────────────────────────────────────────────
+channel_ids:
+  min: 0
+  max: 15             # 16 channels per detector, IDs 0–15
+  severity: 3
+
+# ── timestamp monotonicity ────────────────────────────────────────────────────
+# Events must arrive in strictly increasing time order.
+# Equal timestamps mean a clock register failed to increment — stale read.
+timestamp_monotone:
+  strict: true        # equal timestamps are a violation (not just decreasing)
+  severity: 3
+
+# ── hit multiplicity vs energy ────────────────────────────────────────────────
+# Below threshold: no hits registered. At or above: at least one hit required.
+# This is a deterministic physical relationship.
+hit_multiplicity_rule:
+  energy_threshold_keV: 5.0
+  severity: 3
+
+# ── temperature rate-of-change ────────────────────────────────────────────────
+# Detector temperature changes slowly due to thermal mass.
+# A single-event delta above this limit indicates a sensor read error.
+temperature_rate_of_change:
+  max_delta_K: 0.3    # matches TEMP_MAX_RATE_K in generator.py
+  severity: 2
+
+# ── cross-field amplitude consistency ─────────────────────────────────────────
+# signal_amplitude ≈ gain * energy_deposit + noise_floor (per channel).
+# The channel gain and noise floor are loaded from channel_params.json.
+# Tolerance set at 20x readout noise sigma (σ=0.5 mV → tol=10 mV).
+# This is conservative enough to produce zero FPs on clean data while
+# catching any uncorrelated amplitude injection.
+cross_field_amplitude:
+  channel_params_path: "data/channel_params.json"
+  tolerance_mV: 10.0
+  severity: 2
+
+# ── rolling z-score ───────────────────────────────────────────────────────────
+# Flags rows where a field value is more than `threshold` sigma from the
+# rolling mean of the preceding window.
+# Cold start: no flags until the window has accumulated min_samples rows.
+# Fields listed here are checked independently.
+z_score:
+  window_size: 500
+  threshold: 3.5
+  min_samples: 30
+  fields:
+    - energy_deposit_keV
+    - temperature_K
+  severity: 1

@@ -4,7 +4,7 @@ Injects 6 corruption types into eval_clean.csv.
 
 Outputs:
   eval_corrupted.csv  — the dataset your detectors will run on
-  labels.csv          — ground truth (DO NOT OPEN UNTIL PHASE 4)
+  labels.csv          — injected labels for the evaluation set
 
 Each corruption type targets ~0.8% of eval rows (~80 rows / type).
 Rows are only corrupted once — no overlap between types.
@@ -99,7 +99,7 @@ def inject(
         print(f"  {ctype:<25} {counts.get(ctype, 0)}")
     print()
     print(f"  eval_corrupted.csv → data/")
-    print(f"  labels.csv         → data/  ← SEAL THIS. Do not open until Phase 4.")
+    print(f"  labels.csv         → data/")
 
 
 # ── corruption appliers ────────────────────────────────────────────────────────

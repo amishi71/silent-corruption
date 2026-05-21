@@ -1,6 +1,6 @@
 """
 profile.py
-Sanity-check the clean splits before moving to Phase 2.
+Sanity-check the clean splits before moving to the next stage.
 
 Checks:
   - Shape and null counts

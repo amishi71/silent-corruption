@@ -1,0 +1,15 @@
+detector,corruption_type,n_labeled,tp,fp_approx,fn,precision,recall,f1
+rules,bit_flip,80,78,0,2,1.0,0.975,0.9873
+rules,phantom_detector,80,80,0,0,1.0,1.0,1.0
+rules,stale_timestamp,80,80,0,0,1.0,1.0,1.0
+rules,thermal_spike,158,158,0,0,1.0,1.0,1.0
+rules,cross_field,80,75,0,5,1.0,0.9375,0.9677
+rules,subtle_drift,76,1,0,75,1.0,0.0132,0.026
+rules,AGGREGATE,554,472,0,82,1.0,0.852,0.9201
+ae,bit_flip,80,70,16,10,0.814,0.875,0.8434
+ae,phantom_detector,80,80,16,0,0.8333,1.0,0.9091
+ae,stale_timestamp,80,2,16,78,0.1111,0.025,0.0408
+ae,thermal_spike,158,81,32,77,0.7168,0.5127,0.5978
+ae,cross_field,80,59,16,21,0.7867,0.7375,0.7613
+ae,subtle_drift,76,1,15,75,0.0625,0.0132,0.0217
+ae,AGGREGATE,554,293,112,261,0.7235,0.5289,0.6111

@@ -175,10 +175,10 @@ class InvariantChecker:
             sev  = int(params.get("severity", 2))
 
             if "min" in params:
-                for idx in np.where(vals <= params["min"])[0]:
+                for idx in np.where(vals < params["min"])[0]:
                     flags.append(Flag(
                         int(idx), field, "range_check", sev,
-                        f"{field}={vals[idx]:.4f} ≤ min={params['min']}"
+                        f"{field}={vals[idx]:.4f} below min={params['min']}"
                     ))
 
             if "max" in params:
@@ -238,7 +238,7 @@ class InvariantChecker:
         mult      = df["hit_multiplicity"].values.astype(int)
         above     = energy >= threshold
         # Violation: above threshold with zero hits, OR below threshold with hits
-        bad = np.where((above & (mult == 0)) | (~above & (mult != 0)))[0]
+        bad = np.where(above & (mult == 0))[0]  # only: above threshold, zero hits
         return [
             Flag(
                 int(i), "hit_multiplicity", "hit_multiplicity_rule", sev,

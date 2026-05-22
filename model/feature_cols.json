@@ -1,0 +1,10 @@
+[
+  "detector_id",
+  "channel_id",
+  "energy_deposit_keV",
+  "hit_multiplicity",
+  "signal_amplitude_mV",
+  "noise_floor_mV",
+  "temperature_K",
+  "run_status_enc"
+]

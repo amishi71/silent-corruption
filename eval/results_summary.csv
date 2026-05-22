@@ -1,0 +1,3 @@
+detector,corruption_type,n_labeled,tp,fp_approx,fn,precision,recall,f1
+rules,AGGREGATE,554,472,0,82,1.0,0.852,0.9201
+ae,AGGREGATE,554,293,112,261,0.7235,0.5289,0.6111

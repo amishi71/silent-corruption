@@ -92,7 +92,6 @@ class TabularAE(nn.Module):
             "n_features":  self.n_features,
             "bottleneck":  self.bottleneck,
         }, path)
-        print(f"  Model saved → {path}")
 
     @classmethod
     def load(cls, path: Path) -> "TabularAE":

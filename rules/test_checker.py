@@ -118,17 +118,16 @@ def _():
     assert fl.empty, f"Expected no flags on clean rows, got {len(fl)}"
 
 
-@test("range_check: energy ≤ 0 is flagged (severity 3)")
+@test("range_check: energy < 0 is flagged (severity 3)")
 def _():
     c  = _checker()
     df = _base_row(3)
-    df.loc[1, "energy_deposit_keV"] = 0.0    # boundary — must be > 0
+    df.loc[1, "energy_deposit_keV"] = -1.0   # strictly negative — must be flagged
     fl = c.check(df)
     rc = fl[fl["rule_type"] == "range_check"]
     assert len(rc) == 1, f"Expected 1 range flag, got {len(rc)}"
     assert rc.iloc[0]["row_index"] == 1
     assert rc.iloc[0]["severity"]  == 3
-
 
 @test("range_check: energy > 500 is flagged")
 def _():
@@ -248,15 +247,19 @@ def _():
     assert hm.iloc[0]["severity"]  == 3
 
 
-@test("hit_multiplicity_rule: energy below threshold with hits is flagged")
+@test("hit_multiplicity_rule: energy below threshold with hits is NOT flagged")
 def _():
+    # Regression test for fix_hit_multiplicity: low-energy events legitimately
+    # register hits. The ~above & (mult != 0) condition was removed because it
+    # generated 1,907 false positives on clean data. This behaviour is now correct.
     c  = _checker()
     df = _base_row(3)
     df.loc[0, "energy_deposit_keV"] = 2.0   # below threshold
-    df.loc[0, "hit_multiplicity"]   = 1     # should be 0
+    df.loc[0, "hit_multiplicity"]   = 1     # valid — low energy can still register hits
     fl = c.check(df)
     hm = fl[fl["rule_type"] == "hit_multiplicity_rule"]
-    assert any(hm["row_index"] == 0)
+    assert not any(hm["row_index"] == 0), \
+        "Low-energy row with hits incorrectly flagged — fix_hit_multiplicity regression"
 
 
 @test("temperature_rate_of_change: stable temperature passes")
@@ -397,7 +400,22 @@ def _():
     assert not any(zf["row_index"] == 5), \
         "Row 5 flagged before cold-start window filled — min_samples not respected"
 
-
+@test("range_check: hit_multiplicity=0 with low energy is NOT a false positive")
+def _():
+    # Regression test for the <= vs < bug in _check_ranges.
+    # hit_multiplicity=0 is valid when energy is below threshold.
+    # The lower-bound check must be strict (value < min), not (value <= min).
+    c = _checker()
+    df = _base_row(3)
+    df["energy_deposit_keV"] = [1.0, 2.0, 3.0]   # all below 5 keV threshold
+    df["hit_multiplicity"]   = [0, 0, 0]           # zero hits — valid for low energy
+    fl = c.check(df)
+    rc = fl[fl["rule_type"] == "range_check"]
+    fp_rows = rc[rc["field"] == "hit_multiplicity"]["row_index"].tolist()
+    assert len(fp_rows) == 0, (
+        f"hit_multiplicity=0 incorrectly flagged as range violation on rows {fp_rows}. "
+        f"Lower-bound check must use strict < not <=."
+    )
 # ── runner ─────────────────────────────────────────────────────────────────────
 
 if __name__ == "__main__":

@@ -1,0 +1,4 @@
+dataset,n_rows,mean_keV,median_keV,std_keV,p10_keV,p90_keV
+clean_baseline,10000,32.814206,15.697,40.049823,2.2391,113.02917
+contaminated_no_detection,10000,39.63224,15.87765,140.052579,2.26317,114.5418
+after_pipeline_detection,9415,32.311733,15.481,39.674332,2.20608,112.61438

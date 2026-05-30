@@ -12,7 +12,7 @@
 ## What this is
 
 A two-system face-off for detecting silent corruption in scientific instrument data —
-built as a direct precursor to anomaly detection work on real HEP datasets (CERN track).
+built as a direct precursor to anomaly detection work on real HEP datasets.
 
 **System 1 — Invariant rules engine:** Deterministic checks encoding physical constraints:
 field ranges, registered detector IDs, timestamp monotonicity, cross-field amplitude
@@ -158,7 +158,7 @@ Simulated particle detector readings. Fields:
 | `temperature_K`       | float       | rate-of-change bounded                      |
 | `run_status`          | categorical | transitions: init → active → closed         |
 
-Domain chosen for direct alignment with CERN data quality infrastructure and as a
+Domain chosen for direct alignment with high-energy physics data quality infrastructure and as a
 foundation for L05 (physics anomaly detector on real HEP data).
 
 ---
